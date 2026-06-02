@@ -1,9 +1,9 @@
 name: Publish Docker images
-
+ 
 on:
   workflow_run:
     workflows:
-      - SonarCloud analysis
+      - Test backend and SonarCloud
     types:
       - completed
     branches:
