@@ -1,0 +1,19 @@
+# Maven
+target/
+
+# IDE
+.idea/
+.vscode/
+
+# Logs
+*.log
+
+# Environment variables
+.env
+
+# Database persistence
+postgres-data/
+
+# OS files
+.DS_Store
+Thumbs.db
