@@ -21,9 +21,13 @@ jobs:
           distribution: temurin
           java-version: 21
 
+      - name: Give execute permission
+        working-directory: ./simple-api
+        run: chmod +x mvnw
+
       - name: Build and test with Maven
         working-directory: ./simple-api
-        run: mvn clean verify
+        run: ./mvnw clean verify
 
   build-and-push-docker-image:
     needs: test-backend
