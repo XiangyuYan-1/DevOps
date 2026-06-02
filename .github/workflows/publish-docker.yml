@@ -10,18 +10,19 @@ on:
       - main
 
 jobs:
-
   build-and-push-backend:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Login DockerHub
-        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login \
-             --username "${{ secrets.DOCKERHUB_USERNAME }}" \
-             --password-stdin
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build backend image
         uses: docker/build-push-action@v6
@@ -32,18 +33,19 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:v${{ github.run_number }}
             ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:latest
 
-
   build-and-push-database:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Login DockerHub
-        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login \
-             --username "${{ secrets.DOCKERHUB_USERNAME }}" \
-             --password-stdin
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build database image
         uses: docker/build-push-action@v6
@@ -55,18 +57,19 @@ jobs:
             ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-database:v${{ github.run_number }}
             ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-database:latest
 
-
   build-and-push-httpd:
     if: ${{ github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-      - name: Login DockerHub
-        run: echo "${{ secrets.DOCKERHUB_TOKEN }}" | docker login \
-             --username "${{ secrets.DOCKERHUB_USERNAME }}" \
-             --password-stdin
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
 
       - name: Build httpd image
         uses: docker/build-push-action@v6
