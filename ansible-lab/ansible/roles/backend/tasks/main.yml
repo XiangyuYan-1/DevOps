@@ -1,0 +1,18 @@
+- name: Run backend container
+  community.docker.docker_container:
+    name: backend
+    image: xiangyuyan/tp-devops-simple-api:latest
+    state: started
+    restart_policy: always
+
+    env:
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres-db:5432/db"
+      SPRING_DATASOURCE_USERNAME: "usr"
+      SPRING_DATASOURCE_PASSWORD: "pwd"
+      SPRING_JPA_DATABASE_PLATFORM: "org.hibernate.dialect.PostgreSQLDialect"
+
+    networks:
+      - name: app-network
+
+    published_ports:
+      - "8080:8080"
