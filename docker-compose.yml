@@ -24,6 +24,7 @@ services:
       - database
 
   httpd:
+    build: ./httpd
     image: tp01-reverse-proxy
     container_name: reverse-proxy
     networks:
