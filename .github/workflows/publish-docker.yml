@@ -79,3 +79,57 @@ jobs:
           tags: |
             ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:v${{ github.run_number }}
             ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
+
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    needs:
+      - build-and-push-backend
+      - build-and-push-database
+      - build-and-push-httpd
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Deploy application on remote server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: xiangyu.yan.takima.school
+          username: admin
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-database:latest
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:latest
+            sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
+
+            sudo docker rm -f postgres-db backend reverse-proxy || true
+
+            sudo docker network create app-network || true
+            sudo docker network create proxy-network || true
+
+            sudo docker run -d \
+              --name postgres-db \
+              --network app-network \
+              -p 5432:5432 \
+              -e POSTGRES_DB=db \
+              -e POSTGRES_USER=usr \
+              -e POSTGRES_PASSWORD=pwd \
+              ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-database:latest
+
+            sudo docker run -d \
+              --name backend \
+              --network app-network \
+              -p 8080:8080 \
+              -e SPRING_DATASOURCE_URL="jdbc:postgresql://postgres-db:5432/db" \
+              -e SPRING_DATASOURCE_USERNAME=usr \
+              -e SPRING_DATASOURCE_PASSWORD=pwd \
+              -e SPRING_JPA_DATABASE_PLATFORM=org.hibernate.dialect.PostgreSQLDialect \
+              ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-simple-api:latest
+
+            sudo docker run -d \
+              --name reverse-proxy \
+              --network proxy-network \
+              -p 80:80 \
+              ${{ secrets.DOCKERHUB_USERNAME }}/tp-devops-httpd:latest
+
+            sudo docker network connect app-network reverse-proxy || true
+
+            sudo docker ps
