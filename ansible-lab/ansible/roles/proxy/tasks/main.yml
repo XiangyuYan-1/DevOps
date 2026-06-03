@@ -1,0 +1,15 @@
+- name: Run reverse proxy container
+  community.docker.docker_container:
+    name: reverse-proxy
+
+    image: xiangyuyan/tp-devops-httpd:latest
+
+    state: started
+    restart_policy: always
+
+    networks:
+      - name: proxy-network
+      - name: app-network
+
+    published_ports:
+      - "80:80"
