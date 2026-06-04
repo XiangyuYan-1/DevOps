@@ -5,7 +5,10 @@ on:
     branches:
       - main
       - develop
+      - test-deployment-update
   pull_request:
+    branches:
+      - main
 
 jobs:
   test-backend:
@@ -15,7 +18,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
-    	  submodules: recursive
+          submodules: recursive
           fetch-depth: 0
 
       - name: Set up JDK 21
@@ -47,6 +50,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
+          submodules: recursive
           fetch-depth: 0
 
       - name: Set up JDK 21
@@ -61,9 +65,11 @@ jobs:
 
       - name: Run SonarCloud analysis
         working-directory: ./simple-api
+        env:
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
         run: |
           ./mvnw verify sonar:sonar \
-          -Dsonar.projectKey=XiangyuYan-1_DevOps \
-          -Dsonar.organization=xiangyuyan-1 \
-          -Dsonar.host.url=https://sonarcloud.io \
-          -Dsonar.token=${{ secrets.SONAR_TOKEN }}
+            -Dsonar.projectKey=XiangyuYan-1_DevOps \
+            -Dsonar.organization=xiangyuyan-1 \
+            -Dsonar.host.url=https://sonarcloud.io \
+            -Dsonar.token=$SONAR_TOKEN
